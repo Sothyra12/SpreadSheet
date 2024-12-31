@@ -55,4 +55,9 @@ window.onload = () => {
 const update = event => {
   const element = event.target;
   const value = element.value.replace(/\s/g, ""); // Remove white spaces
+  
+  // to check if the first value starts with "=", we can use [0], .startsWith(), or charAt(0)
+  if (!value.includes(element.id) && value.charAt(0) === "=") {
+
+  }
 };
