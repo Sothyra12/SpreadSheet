@@ -1,22 +1,30 @@
 // script.js
 
+// infix binary operator is an operator that is placed between two operands
+// all binary operators in javascript are infix operators
+const infixToFunction = {
+  "+": (x, y) => x + y,
+  "-": (x, y) => x - y,
+  "*": (x,y) => x * y,
+  "/": (x, y) => x / y,
+}
 const isEven = (num) => num % 2 === 0;
 const sum = (nums) => nums.reduce((acc, el) => acc + el, 0);
 const average = (nums) => sum(nums) / nums.length;
 
-const median = nums => {
-  const sorted = nums.slice().sort((a,b) => a -b);
+const median = (nums) => {
+  const sorted = nums.slice().sort((a, b) => a - b);
   const length = sorted.length;
   const middle = length / 2 - 1;
   return isEven(length)
-  ? average([sorted[middle], sorted[middle + 1]])
-  : sorted[Math.ceil(middle)];
+    ? average([sorted[middle], sorted[middle + 1]])
+    : sorted[Math.ceil(middle)];
 };
 
 const spreadsheetFunctions = {
   sum,
   average,
-  median
+  median,
 };
 
 // function to generate a range of numbers
@@ -30,22 +38,29 @@ const charRange = (start, end) =>
     String.fromCharCode(code)
   );
 
-const evalFormula = id => {
-  const idToText = id => cells.find(cell => cell.id === id).value;
+const evalFormula = (id) => {
+  const idToText = (id) => cells.find((cell) => cell.id === id).value;
   const rangeRegex = /([A-J])([1-9][0-9]?):([A-J])([1-9][0-9]?)/gi;
   const rangeFromString = (num1, num2) => range(parseInt(num1), parseInt(num2));
   // currying is the concept of returning a function within a function
-    // const elemValue = num => {
-    //   const inner = character => {
-    //     return idToText(character + num);
-    //   }
-    //   return inner;
-    // }
-  const elemValue = num => character => idToText(character + num);
+  // const elemValue = num => {
+  //   const inner = character => {
+  //     return idToText(character + num);
+  //   }
+  //   return inner;
+  // }
+  const elemValue = (num) => (character) => idToText(character + num);
   // a function reference is a function name without the parentheses
-  const addCharacters = character1 => character2 => num => charRange(character1, character2).map(elemValue(num));
-  const rangeExpanded = x.replace(rangeRegex, (match) => {});
-};  
+  const addCharacters = (character1) => (character2) => (num) =>
+    charRange(character1, character2).map(elemValue(num));
+  const rangeExpanded = x.replace(
+    rangeRegex,
+    (_match, char1, num1, char2, num2) => // _match is an unused variable labelling with an underscore (prefix)
+      rangeFromString(num1, num2).map(addCharacters(char1)(char2)) // addCharacters(char1)(char2) = immediately invoke returned functions
+  );
+  const cellRegex = /[A-J][1-9][0-9]?/gi;
+  const cellExpanded = rangeExpanded.replace(cellRegex, match => idToText(match.toUpperCase()));
+};
 
 window.onload = () => {
   const container = document.getElementById("container");
@@ -70,12 +85,11 @@ window.onload = () => {
   });
 };
 
-const update = event => {
+const update = (event) => {
   const element = event.target;
   const value = element.value.replace(/\s/g, ""); // Remove white spaces
-  
+
   // to check if the first value starts with "=", we can use [0], .startsWith(), or charAt(0)
   if (!value.includes(element.id) && value.charAt(0) === "=") {
-
   }
 };
