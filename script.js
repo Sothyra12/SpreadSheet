@@ -38,6 +38,17 @@ const spreadsheetFunctions = {
   median,
 };
 
+const applyFunction = str => {
+  const noHigh = highPrecedence(str);
+  const infix = /([\d.]+)([+-])([\d.]+)/;
+  const str2 = infixEval(noHigh, infix);
+  const functionCall = /([a-z0-9]*)\(([0-9., ]*)\)(?!.*\()/i;
+  const toNumberList = args => args.split(",").map(parseFloat);
+  const apply = (fn, args) => spreadsheetFunctions[fn.toLowerCase()](toNumberList(args));
+  // hasOwnProperty is a method that returns a boolean indicating whether the object has the specified property as its own property
+  return str2.replace(functionCall, (match, fn, args) => spreadsheetFunctions.hasOwnProperty(fn.toLowerCase()) ? apply(fn, args) : match);
+}
+
 // function to generate a range of numbers
 const range = (start, end) =>
   Array(end - start + 1)
@@ -78,6 +89,7 @@ const evalFormula = (id) => {
   const cellExpanded = rangeExpanded.replace(cellRegex, (match) =>
     idToText(match.toUpperCase())
   );
+  const functionExpanded = applyFunction(cellExpanded);
 };
 
 window.onload = () => {
