@@ -36,6 +36,13 @@ const spreadsheetFunctions = {
   sum,
   average,
   median,
+  even: nums => nums.filter(isEven),
+  someeven: nums => nums.some(isEven),
+  everyeven: nums => nums.every(isEven),
+  firsttwo: nums => nums.slice(0, 2),
+  lasttwo: nums => nums.slice(-2),
+  has2: nums => nums.includes(2),
+  increment: nums => nums.map(num => num + 1),
 };
 
 const applyFunction = str => {
@@ -60,7 +67,7 @@ const charRange = (start, end) =>
     String.fromCharCode(code)
   );
 
-const evalFormula = (id) => {
+const evalFormula = (x, cells) => {
   const idToText = (id) => cells.find((cell) => cell.id === id).value;
   const rangeRegex = /([A-J])([1-9][0-9]?):([A-J])([1-9][0-9]?)/gi;
   const rangeFromString = (num1, num2) => range(parseInt(num1), parseInt(num2));
@@ -90,6 +97,7 @@ const evalFormula = (id) => {
     idToText(match.toUpperCase())
   );
   const functionExpanded = applyFunction(cellExpanded);
+  return functionExpanded === x ? functionExpand : evalFormula(functionExpanded, cells);
 };
 
 window.onload = () => {
@@ -120,6 +128,7 @@ const update = (event) => {
   const value = element.value.replace(/\s/g, ""); // Remove white spaces
 
   // to check if the first value starts with "=", we can use [0], .startsWith(), or charAt(0)
-  if (!value.includes(element.id) && value.charAt(0) === "=") {
+  if (!value.includes(element.id) && value.startsWith('=')) {
+    element.value = evalFormula(value.slice(1), Array.from(document.getElementById("container").children));
   }
 };
