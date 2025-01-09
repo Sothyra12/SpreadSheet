@@ -37,33 +37,38 @@ const spreadsheetFunctions = {
   sum,
   average,
   median,
-  even: nums => nums.filter(isEven),
-  someeven: nums => nums.some(isEven),
-  everyeven: nums => nums.every(isEven),
-  firsttwo: nums => nums.slice(0, 2),
-  lasttwo: nums => nums.slice(-2),
-  has2: nums => nums.includes(2),
-  increment: nums => nums.map(num => num + 1),
+  even: (nums) => nums.filter(isEven),
+  someeven: (nums) => nums.some(isEven),
+  everyeven: (nums) => nums.every(isEven),
+  firsttwo: (nums) => nums.slice(0, 2),
+  lasttwo: (nums) => nums.slice(-2),
+  has2: (nums) => nums.includes(2),
+  increment: (nums) => nums.map((num) => num + 1),
   // random: nums => {
   //   const [first, second] = nums.slice(0, 2); // Take the first two numbers
   //   const rangeEnd = first + second; // Calculate the upper range limit (exclusive)
   //   return Math.floor(Math.random() * (rangeEnd - first) + first); // Generate random number
   // }
   random: ([x, y]) => Math.floor(Math.random() * y + x),
-  range: nums => range(...nums),
-  nodupes: nums => [...new Set(nums).values()]
+  range: (nums) => range(...nums),
+  nodupes: (nums) => [...new Set(nums).values()],
 };
 
-const applyFunction = str => {
+const applyFunction = (str) => {
   const noHigh = highPrecedence(str);
   const infix = /([\d.]+)([+-])([\d.]+)/;
   const str2 = infixEval(noHigh, infix);
   const functionCall = /([a-z0-9]*)\(([0-9., ]*)\)(?!.*\()/i;
-  const toNumberList = args => args.split(",").map(parseFloat);
-  const apply = (fn, args) => spreadsheetFunctions[fn.toLowerCase()](toNumberList(args));
+  const toNumberList = (args) => args.split(",").map(parseFloat);
+  const apply = (fn, args) =>
+    spreadsheetFunctions[fn.toLowerCase()](toNumberList(args));
   // hasOwnProperty is a method that returns a boolean indicating whether the object has the specified property as its own property
-  return str2.replace(functionCall, (match, fn, args) => spreadsheetFunctions.hasOwnProperty(fn.toLowerCase()) ? apply(fn, args) : match);
-}
+  return str2.replace(functionCall, (match, fn, args) =>
+    spreadsheetFunctions.hasOwnProperty(fn.toLowerCase())
+      ? apply(fn, args)
+      : match
+  );
+};
 
 // function to generate a range of numbers
 const range = (start, end) =>
@@ -106,7 +111,9 @@ const evalFormula = (x, cells) => {
     idToText(match.toUpperCase())
   );
   const functionExpanded = applyFunction(cellExpanded);
-  return functionExpanded === x ? functionExpand : evalFormula(functionExpanded, cells);
+  return functionExpanded === x
+    ? functionExpanded
+    : evalFormula(functionExpanded, cells);
 };
 
 window.onload = () => {
@@ -137,7 +144,10 @@ const update = (event) => {
   const value = element.value.replace(/\s/g, ""); // Remove white spaces
 
   // to check if the first value starts with "=", we can use [0], .startsWith(), or charAt(0)
-  if (!value.includes(element.id) && value.startsWith('=')) {
-    element.value = evalFormula(value.slice(1), Array.from(document.getElementById("container").children));
+  if (!value.includes(element.id) && value.startsWith("=")) {
+    element.value = evalFormula(
+      value.slice(1),
+      Array.from(document.getElementById("container").children)
+    );
   }
 };
